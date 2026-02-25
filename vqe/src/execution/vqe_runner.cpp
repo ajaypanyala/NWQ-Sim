@@ -402,8 +402,10 @@ namespace vqe
       double expectation_time = 0.0;
       const bool needs_grad = optimizer_needs_gradient(options.optimizer);
 
-      // Random number generator for SPSA (if enabled)
-      static std::mt19937 rng(std::random_device{}());
+      // Honor --seed for reproducibility.
+      const unsigned rng_seed = options.random_seed.has_value() ? *options.random_seed
+                                                                : static_cast<unsigned>(std::random_device{}());
+      std::mt19937 rng(rng_seed);
       objective_context<Backend> context{&ansatz, &backend, &pauli_terms, &eval_count, &apply_time, &expectation_time, &logger,
                                           needs_grad, options.use_spsa_gradient, &rng,
                                           options.gradient_step};
